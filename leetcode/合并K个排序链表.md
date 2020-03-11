@@ -1,5 +1,5 @@
 
-# 买卖股票的最佳时机
+# 合并K个排序链表
 
 ## 链接：https://leetcode-cn.com/problems/merge-k-sorted-lists/
 ## 解题思路
