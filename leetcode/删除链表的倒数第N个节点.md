@@ -5,8 +5,8 @@
 ### 大体框架：指针。
 ### 细节
 - 设定一个指针second为头结点的后N个，指针first为头结点指针
-- 然后同时移动指针second和指针first，当指针second移动到末尾时候便可以修改移动后的first指针了
 - 当second为null的时候，直接返回first.next便可
+- 然后同时移动指针second和指针first，当指针second移动到末尾时候便可以修改移动后的first指针了
 ## 解题答案
 ```javascript
 /**
@@ -40,5 +40,5 @@ var removeNthFromEnd = function(head, n) {
         first.next = first.next.next
     }
     return head
-};
+}; 
 ```
