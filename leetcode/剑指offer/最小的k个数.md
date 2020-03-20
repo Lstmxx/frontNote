@@ -1,5 +1,5 @@
 ## 最小的K个数
-
+## https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/
 ## 解题思路
 ### 这道题一共有三种解题方法
 ### **一、快排**
