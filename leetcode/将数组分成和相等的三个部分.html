@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>将数组分成和相等的三个部分 | FrontNode</title>
+    <meta name="generator" content="VuePress 1.5.0">
+    
+    <meta name="description" content="吾日三省吾身">
+    <link rel="preload" href="/assets/css/0.styles.40d9d627.css" as="style"><link rel="preload" href="/assets/js/app.d62eb3be.js" as="script"><link rel="preload" href="/assets/js/2.236e038e.js" as="script"><link rel="preload" href="/assets/js/13.cb30e1c3.js" as="script"><link rel="prefetch" href="/assets/js/10.b65b0d31.js"><link rel="prefetch" href="/assets/js/11.03bc8f26.js"><link rel="prefetch" href="/assets/js/12.780307d1.js"><link rel="prefetch" href="/assets/js/14.6d85a5d3.js"><link rel="prefetch" href="/assets/js/15.5132f116.js"><link rel="prefetch" href="/assets/js/16.c1c3f222.js"><link rel="prefetch" href="/assets/js/17.241fe90c.js"><link rel="prefetch" href="/assets/js/18.c83b423f.js"><link rel="prefetch" href="/assets/js/19.5d718dcc.js"><link rel="prefetch" href="/assets/js/20.1aac78df.js"><link rel="prefetch" href="/assets/js/21.9a402c51.js"><link rel="prefetch" href="/assets/js/22.e04a4f5d.js"><link rel="prefetch" href="/assets/js/23.ac3eb572.js"><link rel="prefetch" href="/assets/js/24.3cc8574d.js"><link rel="prefetch" href="/assets/js/25.a6b6dc4e.js"><link rel="prefetch" href="/assets/js/26.f40b5590.js"><link rel="prefetch" href="/assets/js/27.ff1c3d17.js"><link rel="prefetch" href="/assets/js/3.1629d787.js"><link rel="prefetch" href="/assets/js/4.33bb8393.js"><link rel="prefetch" href="/assets/js/5.65d72145.js"><link rel="prefetch" href="/assets/js/6.9cb075ee.js"><link rel="prefetch" href="/assets/js/7.1e9113e7.js"><link rel="prefetch" href="/assets/js/8.cae0d7f9.js"><link rel="prefetch" href="/assets/js/9.0e3fc8d4.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.40d9d627.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">FrontNode</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <!----></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>开始</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>blog</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>leetcode</span> <span class="arrow down"></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/leetcode/买卖股票的最佳时机.html" class="sidebar-link">买卖股票的最佳时机</a></li><li><a href="/leetcode/删除链表的倒数第N个节点.html" class="sidebar-link">删除链表的倒数第N个节点</a></li><li><a href="/leetcode/合并K个排序链表.html" class="sidebar-link">合并K个排序链表</a></li><li><a href="/leetcode/四数之和.html" class="sidebar-link">四数之和</a></li><li><a href="/leetcode/字符串最大公因子.html" class="sidebar-link">字符串的最大公因子</a></li><li><a href="/leetcode/将数组分成和相等的三个部分.html" class="active sidebar-link">将数组分成和相等的三个部分</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/leetcode/将数组分成和相等的三个部分.html#解题思路" class="sidebar-link">解题思路</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/leetcode/将数组分成和相等的三个部分.html#大体框架：头尾指针遍历。" class="sidebar-link">大体框架：头尾指针遍历。</a></li><li class="sidebar-sub-header"><a href="/leetcode/将数组分成和相等的三个部分.html#细节" class="sidebar-link">细节</a></li></ul></li><li class="sidebar-sub-header"><a href="/leetcode/将数组分成和相等的三个部分.html#解题答案" class="sidebar-link">解题答案</a></li></ul></li><li><a href="/leetcode/拼写单词.html" class="sidebar-link">拼写单词</a></li><li><a href="/leetcode/最长上升子序列.html" class="sidebar-link">最长上升子序列</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>剑指offer</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>格式化函数</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>每日积累</span> <span class="arrow right"></span></p> <!----></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="将数组分成和相等的三个部分"><a href="#将数组分成和相等的三个部分" class="header-anchor">#</a> 将数组分成和相等的三个部分</h1> <p>链接：<a href="https://leetcode-cn.com/problems/partition-array-into-three-parts-with-equal-sum/">https://leetcode-cn.com/problems/partition-array-into-three-parts-with-equal-sum/</a></p> <h2 id="解题思路"><a href="#解题思路" class="header-anchor">#</a> 解题思路</h2> <h3 id="大体框架：头尾指针遍历。"><a href="#大体框架：头尾指针遍历。" class="header-anchor">#</a> 大体框架：头尾指针遍历。</h3> <h3 id="细节"><a href="#细节" class="header-anchor">#</a> 细节</h3> <ul><li>求每一部分的值，sum / 3，如果为小数，则直接return false。</li></ul> <h2 id="解题答案"><a href="#解题答案" class="header-anchor">#</a> 解题答案</h2> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">/**
+ * @param {number[]} A
+ * @return {boolean}
+ */</span>
+<span class="token keyword">var</span> <span class="token function-variable function">canThreePartsEqualSum</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter"><span class="token constant">A</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token constant">A</span><span class="token punctuation">.</span>length <span class="token operator">&lt;</span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">let</span> sum <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token constant">A</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">data</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        sum <span class="token operator">+=</span> data
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">let</span> target <span class="token operator">=</span> sum <span class="token operator">/</span> <span class="token number">3</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">String</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">&quot;.&quot;</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">let</span> start <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">let</span> end <span class="token operator">=</span> <span class="token constant">A</span><span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span>
+    <span class="token keyword">let</span> start_sum <span class="token operator">=</span> <span class="token keyword">null</span>
+    <span class="token keyword">let</span> end_sum <span class="token operator">=</span> <span class="token keyword">null</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>start <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> end <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>start_sum <span class="token operator">!==</span> target <span class="token operator">||</span> end_sum <span class="token operator">!==</span> target<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>start_sum <span class="token operator">!==</span> target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            start_sum <span class="token operator">+=</span> <span class="token constant">A</span><span class="token punctuation">[</span>start<span class="token punctuation">]</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>start_sum <span class="token operator">!==</span> target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                start <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>end_sum <span class="token operator">!==</span> target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            end_sum <span class="token operator">+=</span> <span class="token constant">A</span><span class="token punctuation">[</span>end<span class="token punctuation">]</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>end_sum <span class="token operator">!==</span> target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                end <span class="token operator">-=</span> <span class="token number">1</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> start_sum <span class="token operator">===</span> target <span class="token operator">&amp;&amp;</span> end_sum <span class="token operator">===</span> target
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/leetcode/字符串最大公因子.html" class="prev">
+        字符串的最大公因子
+      </a></span> <span class="next"><a href="/leetcode/拼写单词.html">
+        拼写单词
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.d62eb3be.js" defer></script><script src="/assets/js/2.236e038e.js" defer></script><script src="/assets/js/13.cb30e1c3.js" defer></script>
+  </body>
+</html>
