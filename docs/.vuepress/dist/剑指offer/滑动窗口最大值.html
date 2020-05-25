@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>面试题59 - I. 滑动窗口的最大值 | FrontNode</title>
+    <meta name="generator" content="VuePress 1.5.0">
+    
+    <meta name="description" content="吾日三省吾身">
+    <link rel="preload" href="/assets/css/0.styles.40d9d627.css" as="style"><link rel="preload" href="/assets/js/app.d36c0071.js" as="script"><link rel="preload" href="/assets/js/2.236e038e.js" as="script"><link rel="preload" href="/assets/js/21.5df03074.js" as="script"><link rel="prefetch" href="/assets/js/10.ad26ef94.js"><link rel="prefetch" href="/assets/js/11.9a57f051.js"><link rel="prefetch" href="/assets/js/12.04adf473.js"><link rel="prefetch" href="/assets/js/13.526da002.js"><link rel="prefetch" href="/assets/js/14.436ab033.js"><link rel="prefetch" href="/assets/js/15.fec229b9.js"><link rel="prefetch" href="/assets/js/16.47593247.js"><link rel="prefetch" href="/assets/js/17.0a2363a6.js"><link rel="prefetch" href="/assets/js/18.197f9c78.js"><link rel="prefetch" href="/assets/js/19.068f9909.js"><link rel="prefetch" href="/assets/js/20.1aac78df.js"><link rel="prefetch" href="/assets/js/22.e04a4f5d.js"><link rel="prefetch" href="/assets/js/23.c2d2c61a.js"><link rel="prefetch" href="/assets/js/24.fad459f4.js"><link rel="prefetch" href="/assets/js/25.a6b6dc4e.js"><link rel="prefetch" href="/assets/js/26.f40b5590.js"><link rel="prefetch" href="/assets/js/27.ff1c3d17.js"><link rel="prefetch" href="/assets/js/3.1629d787.js"><link rel="prefetch" href="/assets/js/4.33bb8393.js"><link rel="prefetch" href="/assets/js/5.65d72145.js"><link rel="prefetch" href="/assets/js/6.9cb075ee.js"><link rel="prefetch" href="/assets/js/7.1e9113e7.js"><link rel="prefetch" href="/assets/js/8.b01adea5.js"><link rel="prefetch" href="/assets/js/9.8ceb55fb.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.40d9d627.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">FrontNode</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <!----></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>开始</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>blog</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>leetcode</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>剑指offer</span> <span class="arrow down"></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/剑指offer/二维数组中的查找.html" class="sidebar-link">二维数组中的查找</a></li><li><a href="/剑指offer/数值的整数次方.html" class="sidebar-link">数值的整数次方</a></li><li><a href="/剑指offer/最小的k个数.html" class="sidebar-link">最小的K个数</a></li><li><a href="/剑指offer/机器人的运动范围.html" class="sidebar-link">机器人的运动范围</a></li><li><a href="/剑指offer/正则表达式匹配.html" class="sidebar-link">正则表达式匹配</a></li><li><a href="/剑指offer/滑动窗口最大值.html" class="active sidebar-link">面试题59 - I. 滑动窗口的最大值</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/剑指offer/滑动窗口最大值.html#解题思路" class="sidebar-link">解题思路</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/剑指offer/滑动窗口最大值.html#大体框架：遍历。" class="sidebar-link">大体框架：遍历。</a></li><li class="sidebar-sub-header"><a href="/剑指offer/滑动窗口最大值.html#细节：记住最大值的位置，下一次遍历的时，如果最大值位置还在范围内，则直接判断最大值和最后一位值" class="sidebar-link">细节：记住最大值的位置，下一次遍历的时，如果最大值位置还在范围内，则直接判断最大值和最后一位值</a></li></ul></li></ul></li><li><a href="/剑指offer/矩阵中的路径.html" class="sidebar-link">矩阵中的路径</a></li><li><a href="/剑指offer/重建二叉树.html" class="sidebar-link">重建二叉树</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>格式化函数</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>每日积累</span> <span class="arrow right"></span></p> <!----></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="面试题59-i-滑动窗口的最大值"><a href="#面试题59-i-滑动窗口的最大值" class="header-anchor">#</a> 面试题59 - I. 滑动窗口的最大值</h1> <p>链接：<a href="https://leetcode-cn.com/problems/hua-dong-chuang-kou-de-zui-da-zhi-lcof/">https://leetcode-cn.com/problems/hua-dong-chuang-kou-de-zui-da-zhi-lcof/</a></p> <h2 id="解题思路"><a href="#解题思路" class="header-anchor">#</a> 解题思路</h2> <h3 id="大体框架：遍历。"><a href="#大体框架：遍历。" class="header-anchor">#</a> 大体框架：遍历。</h3> <h3 id="细节：记住最大值的位置，下一次遍历的时，如果最大值位置还在范围内，则直接判断最大值和最后一位值"><a href="#细节：记住最大值的位置，下一次遍历的时，如果最大值位置还在范围内，则直接判断最大值和最后一位值" class="header-anchor">#</a> 细节：记住最大值的位置，下一次遍历的时，如果最大值位置还在范围内，则直接判断最大值和最后一位值</h3> <div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number[]}
+ */</span>
+<span class="token keyword">var</span> <span class="token function-variable function">maxSlidingWindow</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">nums<span class="token punctuation">,</span> k</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>nums<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">let</span> res <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">let</span> targetL <span class="token operator">=</span> nums<span class="token punctuation">.</span>length <span class="token operator">-</span> k
+    <span class="token keyword">let</span> maxPos <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;=</span> targetL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> j <span class="token operator">=</span> i
+        <span class="token keyword">let</span> maxValue <span class="token operator">=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">let</span> target <span class="token operator">=</span> i <span class="token operator">+</span> k
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>target <span class="token operator">&gt;</span> maxPos <span class="token operator">&amp;&amp;</span> maxPos <span class="token operator">&gt;=</span> i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>nums<span class="token punctuation">[</span>target <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">&gt;</span> nums<span class="token punctuation">[</span>maxPos<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                maxValue <span class="token operator">=</span> nums<span class="token punctuation">[</span>target <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span>
+                maxPos <span class="token operator">=</span> target <span class="token operator">-</span> <span class="token number">1</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                maxValue <span class="token operator">=</span> nums<span class="token punctuation">[</span>maxPos<span class="token punctuation">]</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">while</span><span class="token punctuation">(</span>j <span class="token operator">&lt;</span> target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">&gt;</span> maxValue<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    maxValue <span class="token operator">=</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+                    maxPos <span class="token operator">=</span> j
+                <span class="token punctuation">}</span>
+                j <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        res<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>maxValue<span class="token punctuation">)</span>
+        i <span class="token operator">+=</span> <span class="token number">1</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> res
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/剑指offer/正则表达式匹配.html" class="prev">
+        正则表达式匹配
+      </a></span> <span class="next"><a href="/剑指offer/矩阵中的路径.html">
+        矩阵中的路径
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.d36c0071.js" defer></script><script src="/assets/js/2.236e038e.js" defer></script><script src="/assets/js/21.5df03074.js" defer></script>
+  </body>
+</html>
