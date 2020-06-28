@@ -159,11 +159,10 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # 第一个参数为事件名，第二个为namespace
 # 通过监听namespace下的事件做出响应，这里的namespace和前面前端定义的namespace要相同
 # message为请求参数
-@socketio.on('user_send_message', namespace='/chatroom')
-def user_input(message):
-    """获取用户输入
-    """
-    # do something
+@socketio.on('test_input', namespace='/chatroom')
+def test_input(message):
+    # do someting
+    socketio.emit('test_received', '收到啦', namespace='/chatroom')
 ```
 
 - 在app.py中引入
@@ -228,6 +227,10 @@ server {
 
 前面把flask和vue都配置好了，那么先测试一下。
 
+整个流程非常简单，流程图如下：
+
+
+
 #### 2.4.1 vue
 
 - 获取用户输入后，向目标事件发送数据。这里我自己实现了一个简陋的rich-text，如果不追求效果直接用input标签就完事了。
@@ -237,7 +240,7 @@ server {
 ···
 sendMessage (message) {
   // 第一个参数为事件名，第二个参数为要发送的数据
-  this.$socket.emit('user_send_message', '看看')
+  this.$socket.emit('test_input', message)
 }
 ```
 
@@ -249,7 +252,7 @@ export default {
   ···
   actions: {
     ···
-    SOCKET_received ({ state, rootState, commit }, responseData) {
+    SOCKET_test_received ({ state, rootState, commit }, responseData) {
       console.log(responseData)
     }
   }
@@ -261,19 +264,228 @@ export default {
 
 后端这边就非常简单了，增加一个消息回调函数就好了。
 
+<image src="1.drawio.png">
+
 ```python
 from flask_socketio import SocketIO, emit
 socketio = SocketIO(app, cors_allowed_origins="*")
 ···
-@socketio.on('user_send_message', namespace='/chatroom')
-def user_input(message):
-    """获取用户输入
-    """
-    socketio.emit('received', message,
-                    namespace='/chatroom')
+@socketio.on('test_input', namespace='/chatroom')
+def test_input(message):
+    # do someting
+    socketio.emit('test_received', '收到啦', namespace='/chatroom')
     # 或者
-    # emit('received', message, namespace='/chatroom')
+    # emit('test_received', '收到啦', namespace='/chatroom')
 ```
 
 要注意的是，这个emit没有指定某一个room，所以会广播给在这个namespace下的所有人。
 
+打开谷歌浏览器，效果如下：
+
+<image src="1.png">
+
+## 3. 实现聊天室小demo
+
+### 3.1 构思
+
+一个简单的聊天室肯定会涉及到用户，房间和消息记录。
+
+### 3.2 实现登录页面
+
+首先解决一下用户，最核心的是登录。流程图如下：
+
+<image src="./2.drawio.png">
+
+- 建一个用户表
+
+```sql
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `create_time` datetime(0) DEFAULT NULL,
+  `avatar_image` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `room_id_set` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `ix_user_username`(`username`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+```
+
+- 封装一下登录接口，使用vuex保存登录状态。因为关闭页面后vuex会清掉token使用cookie来保存（axios的封装就不说了，不是重点）
+
+```js
+// /fronted/src/libs/requestApi.js
+···
+export function baseLogin (config) {
+  const request = {
+    url: config.url,
+    method: 'POST',
+    data: config.data
+  }
+  return service.request(request)
+}
+```
+
+```js
+// /fronted/src/libs/request.js
+export function login (config) {
+  return new Promise((resolve, reject) => {
+    baseLogin(config).then((response) => {
+      resolve(response.data.data)
+    }).catch((err) => {
+      reject(err)
+    })
+  })
+}
+```
+
+- 保存token
+
+```js
+// /fronted/src/libs/utility/token.js
+import Cookies from 'js-cookie'
+const TOKEN_KEY = 'token'
+export const setToken = (token) => {
+  Cookies.set(TOKEN_KEY, token, { expires: 1 })
+}
+
+export const getToken = () => {
+  const token = Cookies.get(TOKEN_KEY)
+  if (token !== 'null') return token
+  else return false
+}
+```
+
+- 编写vuex的user模块
+
+```js
+// /fronted/src/store/module/user.js
+import { getToken, setToken } from '../../libs/utility/token'
+import { login, getUserInfo, logout } from '@/libs/request'
+export default {
+  state: {
+    token: getToken(),
+    userName: null,
+    userId: null,
+    avatarImage: null
+  },
+  getters: {
+    getToken (state) {
+      return state.token
+    },
+    getUserName (state) {
+      return state.userName
+    },
+    getUserId (state) {
+      return state.userId
+    },
+    getAvatarImage (state) {
+      return state.avatarImage
+    }
+  },
+  mutations: {
+    setToken (state, token) {
+      state.token = token
+      setToken(token)
+    },
+    setUserName (state, name) {
+      state.userName = name
+    },
+    setUserId (state, userId) {
+      state.userId = userId
+    },
+    setAvatarImage (state, avatarImage) {
+      state.avatarImage = avatarImage
+    }
+  },
+  actions: {
+    handleLogin ({ commit }, config) {
+      return new Promise((resolve, reject) => {
+        login(config).then((responseData) => {
+          commit('setToken', responseData.token)
+          resolve(responseData)
+        }).catch((err) => {
+          reject(err)
+          console.log(err)
+        })
+      })
+    },
+    loadUserInfo ({ commit }) {
+      return new Promise((resolve, reject) => {
+        getUserInfo().then((responseData) => {
+          commit('setToken', getToken())
+          commit('setUserName', responseData.userInfo.name)
+          commit('setUserId', responseData.userInfo.userId)
+          commit('setAvatarImage', responseData.userInfo.avatar_image)
+          resolve(responseData)
+        }).catch((err) => {
+          commit('setToken', null)
+          reject(err)
+          console.log(err)
+        })
+      })
+    }
+  }
+}
+```
+
+- 在login组件中使用
+
+```js
+// /fronted/src/views/login/login.vue
+import { mapActions } from 'vuex'
+export default {
+  ···
+  methods: {
+    ...mapActions([
+      'handleLogin',
+      'loadUserInfo'
+    ]),
+    checkCapslock (e) {
+      const { key } = e
+      this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
+    },
+    // 登录，成功后跳转
+    onLogin () {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.$Loading.show()
+          const config = {
+            url: '/login',
+            data: this.loginForm
+          }
+          this.handleLogin(config).then(() => {
+            this.$Loading.hide()
+            this.$router.push({
+              name: 'ChatRoom'
+            })
+          }).catch((err) => {
+            this.$Loading.hide()
+            console.log(err)
+          })
+        }
+      })
+    },
+    // 注册，成功后回调登录
+    onRegister () {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.$Loading.show()
+          const config = {
+            url: '/register',
+            data: this.loginForm
+          }
+          this.handleLogin(config).then(() => {
+            this.$Loading.hide()
+            this.onLogin()
+          }).catch((err) => {
+            this.$Loading.hide()
+            console.log(err)
+          })
+        }
+      })
+    }
+  }
+}
+```

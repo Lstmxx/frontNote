@@ -35,3 +35,93 @@ arr = arr[0].map(function(col, i) {
         return row[i]
     })
 })
+
+
+/**
+ * initialize your data structure here.
+ */
+var MinStack = function() {
+    this.minList = {
+        val: null,
+        next: null
+    }
+    this.stackArray = []
+};
+
+/** 
+ * @param {number} x
+ * @return {void}
+ */
+MinStack.prototype.push = function(x) {
+    this.stackArray.push(x)
+    if (this.minList.val === null) {
+        this.minList.val = x
+    } else {
+        let pre = this.minList
+        let back = pre.next
+        while (pre) {
+            if (pre.val > x) {
+                const newPre = {
+                    val: x,
+                    next: pre
+                }
+                pre = newPre
+                this.minList = pre
+                break
+            } else if (back === null) {
+                pre.next = {
+                    val: x,
+                    next: null
+                }
+                break
+            } else if (back.val >= x) {
+                const next = {
+                    val: x,
+                    next: back
+                }
+                pre.next = next
+                break
+            }
+            pre = pre.next
+            back = pre.next || null
+        }
+    }
+};
+
+/**
+ * @return {void}
+ */
+MinStack.prototype.pop = function() {
+    const last = this.stackArray.pop()
+    let pre = this.minList
+    let back = pre.next
+    if (pre.val === last) {
+        this.minList = this.minList.next || {
+            val: null,
+            next: null
+        }
+    } else {
+        while (back) {
+            if (back.val === last) {
+                pre.next = back.next
+                break
+            }
+            pre = pre.next
+            back = pre.next
+        }
+    }
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.top = function() {
+    return this.stackArray[this.stackArray.length - 1]
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.min = function() {
+    return this.minList.val
+};
