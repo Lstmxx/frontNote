@@ -44,17 +44,17 @@ socketio有两个重要的概念——namespace和room。两者关系是namespac
 
 #### 2.1.1 直接使用官方包
 
-- 下载
+下载
 
 ```bash
 npm install socket.io
 ```
-- 引入
+引入
 
 ```js
 import io from 'socket.io-client'
 ```
-- 使用
+使用
 
 ```js
 // 这里的namespace和后端设置的namespace是一样的
@@ -79,13 +79,13 @@ socket.emit('user_input', 'wdnmd')
 
 相较于socket.io-client，VueSocketio自带支持在vuex中使用，这使得多组件共用消息更加便利。npm地址：https://www.npmjs.com/package/vue-socket.io 。
 
-- 下载
+下载
 
 ```bash
 npm install vue-socket.io
 ```
 
-- 引入
+引入
 
 ```js
 // /fronted/src/main.js
@@ -103,7 +103,7 @@ Vue.use(new VueSocketio({
 }))
 ```
 
-- 单组件使用
+单组件使用
 
 ```js
 // 在需要监听的vue引入
@@ -121,7 +121,7 @@ export default {
 ···
 ```
 
-- vuex中使用
+vuex中使用
 
 ```js
 // /store/module/room.js
@@ -140,13 +140,13 @@ SOCKET_join_one ({}, responseData) {
 
 flask中使用socketio主要用到Flask-SocketIO这个包，官网地址：https://flask-socketio.readthedocs.io/en/latest/ 。
 
-- 下载
+下载
 
 ```python
 pip install flask-socketio
 ```
 
-- 使用
+使用
 
 ```python
 ···
@@ -165,7 +165,7 @@ def test_input(message):
     socketio.emit('test_received', '收到啦', namespace='/chatroom')
 ```
 
-- 在app.py中引入
+在app.py中引入
 
 ```python
 # /backend/app.py
@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
 既然是前后端分离，那当然要使用nginx啦~
 
-- 配置chatroom.conf
+配置chatroom.conf
 
 ```nginx
 upstream chat_frontend {
@@ -216,7 +216,7 @@ server {
 }
 ```
 
-- 配置host
+配置host
 
 ```conf
 ···
@@ -233,7 +233,7 @@ server {
 
 #### 2.4.1 vue
 
-- 获取用户输入后，向目标事件发送数据。这里我自己实现了一个简陋的rich-text，如果不追求效果直接用input标签就完事了。
+获取用户输入后，向目标事件发送数据。这里我自己实现了一个简陋的rich-text，如果不追求效果直接用input标签就完事了。
 
 ```js
 // /src/components/chat-room/message-box/message-box.vue
@@ -244,7 +244,7 @@ sendMessage (message) {
 }
 ```
 
-- 在vuex中监听received事件获取服务器返回消息。
+在vuex中监听received事件获取服务器返回消息。
 
 ```js
 // /src/store/module/room.js
@@ -292,11 +292,7 @@ def test_input(message):
 
 ### 3.2 实现登录页面
 
-首先解决一下用户，最核心的是登录。流程图如下：
-
-<image src="./2.drawio.png">
-
-- 建一个用户表
+首先解决一下用户，最核心的是登录。先建一个用户表。
 
 ```sql
 DROP TABLE IF EXISTS `user`;
@@ -306,13 +302,13 @@ CREATE TABLE `user`  (
   `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `create_time` datetime(0) DEFAULT NULL,
   `avatar_image` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `room_id_set` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `room_id_set` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '每个用户所参加的房间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `ix_user_username`(`username`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 ```
 
-- 封装一下登录接口，使用vuex保存登录状态。因为关闭页面后vuex会清掉token使用cookie来保存（axios的封装就不说了，不是重点）
+封装一下登录接口，使用vuex保存登录状态。因为关闭页面后vuex会清掉token使用cookie来保存（axios的封装就不说了，不是重点）
 
 ```js
 // /fronted/src/libs/requestApi.js
@@ -340,7 +336,7 @@ export function login (config) {
 }
 ```
 
-- 保存token
+保存token
 
 ```js
 // /fronted/src/libs/utility/token.js
@@ -357,7 +353,7 @@ export const getToken = () => {
 }
 ```
 
-- 编写vuex的user模块
+编写vuex的user模块
 
 ```js
 // /fronted/src/store/module/user.js
@@ -430,7 +426,7 @@ export default {
 }
 ```
 
-- 在login组件中使用
+在login页面中使用
 
 ```js
 // /fronted/src/views/login/login.vue
@@ -489,3 +485,557 @@ export default {
   }
 }
 ```
+
+后端方面，可以看看/backend/blueprint/user.py。ui方面就不说了，不是重点。
+
+
+### 3.3 实现房间的创建，展示和加入功能
+
+对于房间来说，肯定要有创建和加入这两个功能的，下面先说说创建。
+
+先建个表吧
+
+```sql
+DROP TABLE IF EXISTS `room`;
+CREATE TABLE `room`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `owner` int(11) DEFAULT NULL COMMENT '房间创建人',
+  `user_set` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `create_time` datetime(0) DEFAULT NULL,
+  `update_time` datetime(0) DEFAULT NULL,
+  `avatar_image` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `room_hash_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `ix_room_avatar_image`(`avatar_image`) USING BTREE,
+  INDEX `ix_room_create_time`(`create_time`) USING BTREE,
+  INDEX `ix_room_name`(`name`) USING BTREE,
+  INDEX `ix_room_owner`(`owner`) USING BTREE,
+  INDEX `ix_room_update_time`(`update_time`) USING BTREE,
+  CONSTRAINT `room_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+```
+
+#### 3.3.1 创建房间
+
+首先先明确创建房间需要什么数据，我的想法是需要房间头像，房间名和房间描述。
+
+前端主要是获取了房间头像、房间名和房间描述后发送请求到后端。这里的upLoadFile是自己模仿element来写的组件，有兴趣可以在 /fronted/src/components/base/up-load-file/up-load-file.vue 查看
+
+```vue
+// /fronted/src/components/chat-room/room-list/room-list.vue
+<template>
+···
+    <el-dialog title="创建房间" :visible.sync="createRoomDialog">
+      <el-form :model="createRoom" :rules="createRules" ref="createRoomForm">
+        <el-form-item label="房间名" prop="hashId">
+          <el-input v-model="createRoom.name" autocomplete="off" :maxlength='32' :minlength='32'></el-input>
+        </el-form-item>
+        <el-form-item label="房间描述" prop="description">
+          <el-input v-model="createRoom.description" autocomplete="off" :maxlength='32' :minlength='32'></el-input>
+        </el-form-item>
+        <el-form-item label="房间头像" prop="avatarImage">
+          <upLoadFile :maxImageNum="1" @on-change="getFilePath"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="createRoomDialog = false">取 消</el-button>
+        <el-button type="primary" @click="handleCreateRoom">确 定</el-button>
+      </div>
+    </el-dialog>
+···
+</template>
+<script>
+import { post } from '@/libs/request'
+import upLoadFile from '@/components/base/up-load-file'
+export default {
+  name: 'RoomList',
+  props: {
+    roomList: {
+      default: () => [],
+      type: Array
+    }
+  },
+  components: {
+    ···
+    upLoadFile
+  },
+  data () {
+    return {
+      ···
+      createRoom: {
+        name: '',
+        description: '',
+        avatarImage: ''
+      }
+    }
+  },
+  method: {
+    getFilePath (imageList) {
+      this.createRoom.avatarImage = imageList[0].base64Path
+    },
+    handleCreateRoom () {
+      this.$refs.createRoomForm.validate(valid => {
+        if (valid) {
+          this.$Loading.show()
+          const config = {
+            url: '/room/create',
+            data: this.createRoom
+          }
+          post(config).then((responseData) => {
+            this.$Loading.hide()
+            this.createRoom.name = ''
+            this.createRoomDialog = false
+            this.createRoom = {
+              name: '',
+              description: '',
+              avatarImage: ''
+            }
+            this.$message({
+              message: '创建成功',
+              type: 'success'
+            })
+            this.$emit('create-room-success', responseData.room)
+          }).catch((err) => {
+            this.$Loading.hide()
+            this.createRoomDialog = false
+            console.log(err)
+          })
+        }
+      })
+    }
+  }
+}
+</script>
+```
+
+后端这边就简单了，直接插入数据库。插入时候使用base64来生成房间码，之后加入房间要用。
+
+```python
+# /backend/blueprint/room.py
+···
+@room_bp.route('/api/room/create', methods=['POST'])
+@verify_token
+def room_create(tokenData):
+    values = request.get_json()
+    user = User.query.filter_by(id=tokenData['userId']).first()
+    if user:
+        room = Room(name=values['name'],
+                    description=values['description'],
+                    user_set=str(tokenData['userId']),
+                    owner=user.id,
+                    avatar_image='')
+        db.session.add(room)
+        db.session.flush()
+        room.room_hash_id = hashlib.md5(f'{room.id}{time.time()}'.encode('utf-8')).hexdigest()
+        room.user_set = f'{room.user_set},{user.id}' if room.user_set else user.id
+        if values['avatarImage']:
+            avatartImageList = values['avatarImage'].split(',')
+            suffix = avatartImageList[0].split('/')[1].split(';')[0]
+            filename = f'room_avatar/{room.room_hash_id}.{suffix}'
+            print(filename)
+            with open(f'media/{filename}', 'wb') as f:
+                f.write(base64.b64decode(avatartImageList[1]))
+            room.avatar_image = filename
+        user.room_id_set = f'{user.room_id_set},{room.id}' if user.room_id_set else room.id
+        db.session.commit()
+        return jsonify({
+            'data': {
+                'room': JSONHelper.model_to_json(room)
+            },
+            'message': '成功',
+            'status': 200
+        })
+    return jsonify({
+        'data': '',
+        'message': '失败失败',
+        'status': 500
+    })
+```
+
+#### 3.3.2 展示房间
+
+这个其实就是拉一个房间列表。要注意的是前端获取到房间列表后，要调用join_all这个事件监听这些房间的消息。
+
+后端
+
+```python
+@room_bp.route('/api/room/list', methods=['GET'])
+@verify_token
+def room_list(tokenData):
+    user = User.query.filter_by(id=tokenData['userId']).first()
+    if user:
+        roomlist = Room.query.filter(Room.id.in_(user.room_id_set.split(','))).all() if user.room_id_set else []
+        return jsonify({
+            'data': {
+                'roomList': JSONHelper.to_json_list(roomlist)
+            },
+            'message': '成功',
+            'status': 200
+        })
+    return jsonify({
+        'data': '',
+        'message': '失败失败',
+        'status': 500
+    })
+```
+
+前端这边先在room模块里编写加载房间列表函数。
+
+```js
+// /fronted/src/store/module/room.js
+···
+loadRoomList ({ commit }) {
+  return new Promise((resolve, reject) => {
+    const config = {
+      url: '/room/list'
+    }
+    get(config).then((responseData) => {
+      commit('setRoomList', responseData.roomList)
+      resolve(responseData.roomList)
+    }).catch((err) => {
+      reject(err)
+    })
+  })
+}
+```
+
+在chat-room页面调用。
+
+```js
+// /fronted/src/views/chat-room/chat-room.vue
+mounted () {
+  this.loadRoomList().then((roomList) => {
+    const request = {
+      roomList: roomList.map(room => room.id),
+      userId: this.userId
+    }
+    this.$socket.emit('join_all', request)
+  }).catch((err) => {
+    console.log(err)
+  })
+}
+```
+
+后端响应join_all事件，调用join_room加入用户所在的所有房间。
+
+```python
+# /backend/blueprint/socketio.py
+@socketio.on('join_all', namespace='/chatroom')
+def join_chats(message):
+    """加入多个聊天室
+    """
+    user = User.query.filter_by(id=message['userId']).first()
+    if user and len(message['roomList']) > 0:
+        for roomId in message['roomList']:
+            join_room(roomId)
+            emit('received', { # 发送加入消息
+                'user': {
+                    'id': user.id,
+                    'name': user.username,
+                    'avatarImage': user.avatar_image,
+                },
+                'roomId': roomId,
+                'type': 'join'
+            }, namespace='/chatroom', room=roomId)
+```
+
+#### 3.3.3 加入房间
+
+获取对应的房间码后，输入加入就OK了。
+
+```vue
+// /fronted/src/components/chat-room/room-list/room-list.vue
+<template>
+···
+    <el-dialog title="加入房间" :visible.sync="joinRoomDialog">
+      <el-form :model="joinRoom" :rules="joinRules" ref="joinRoomForm">
+        <el-form-item label="房间号" prop="hashId">
+          <el-input v-model="joinRoom.hashId" autocomplete="off" :maxlength='32' :minlength='32'></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="joinRoomDialog = false">取 消</el-button>
+        <el-button type="primary" @click="handleJoinRoom">确 定</el-button>
+      </div>
+    </el-dialog>
+···
+</template>
+<script>
+import { post } from '@/libs/request'
+export default {
+  name: 'RoomList',
+  props: {
+    roomList: {
+      default: () => [],
+      type: Array
+    }
+  },
+  data () {
+    return {
+      ···
+      joinRoom: {
+        hashId: ''
+      }
+    }
+  },
+  method: {
+    handleJoinRoom () {
+      this.$refs.joinRoomForm.validate(valid => {
+        if (valid) {
+          this.$Loading.show()
+          const config = {
+            url: '/room/join',
+            data: {
+              roomIdHash: this.joinRoom.hashId
+            }
+          }
+          post(config).then((responseData) => {
+            this.$Loading.hide()
+            this.joinRoomDialog = false
+            this.$message({
+              message: '加入成功',
+              type: 'success'
+            })
+            this.$emit('create-room-success', responseData.room)
+          }).catch((err) => {
+            this.$Loading.hide()
+            console.log(err)
+          })
+        }
+      })
+    }
+  }
+}
+</script>
+```
+
+加入成功后，和创建一样，调用join_one_chat事件来加入房间。
+
+```js
+// /fronted/src/views/chat-room/chat-room.vue
+handleCreateJoinRoom (room) {
+  const roomList = this.roomList
+  roomList.push(room)
+  this.$store.commit('setRoomList', roomList)
+  const request = {
+    roomId: room.id,
+    userId: this.userId
+  }
+  this.$socket.emit('join_one_chat', request)
+}
+```
+
+后端响应回调。
+
+```python
+# /backend/blueprint/socketio.py
+@socketio.on('join_one_chat', namespace='/chatroom')
+def join_one_chat(join):
+    """加入聊天室
+    """
+    room = Room.query.filter_by(id=join['roomId']).first()
+    user = User.query.filter_by(id=join['userId']).first()
+    print(join)
+    if room and user:
+        join_room(room.id)
+        emit('received', {
+            'user': {
+                'id': user.id,
+                'name': user.username,
+                'avatarImage': user.avatar_image,
+            },
+            'roomId': room.id,
+            'type': 'join'
+        }, namespace='/chatroom', room=room)
+```
+
+### 3.4 消息记录的发送与保存
+
+先建个表
+
+```sql
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-----------------------------
+-Table structure for room_record
+-----------------------------
+DROP TABLE IF EXISTS `room_record`;
+CREATE TABLE `room_record`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `create_time` datetime(0) DEFAULT NULL,
+  `room_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `ix_room_record_create_time`(`create_time`) USING BTREE,
+  INDEX `ix_room_record_room_id`(`room_id`) USING BTREE,
+  CONSTRAINT `room_record_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `room` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+用户选择了对应房间，在对应房间中发送消息就OK了。
+
+```js
+// /fronted/src/components/chat-room/message-box/message-box.vue
+···
+import { mapGetters, mapActions } from 'vuex'
+import util from '@/libs/utility/util.js'
+import UserMessage from '../user-message/index'
+import JoinMessage from '../join-message/index'
+import RichText from '@/components/base/rich-text/index'
+export default {
+  name: 'MessageBox',
+  components: {
+    UserMessage,
+    JoinMessage,
+    RichText
+  },
+  computed: {
+    ...mapGetters({
+      selectedRoom: 'getSelectedRoom',
+      userId: 'getUserId',
+      userName: 'getUserName',
+      messageList: 'getMessageList',
+      isUpdate: 'getUpdate',
+      avatarImage: 'getAvatarImage'
+    })
+  },
+  watch: {
+    selectedRoom () {
+      this.setMessageContentScroll()
+    },
+    isUpdate () {
+      if (this.isUpdate) {
+        this.$forceUpdate()
+        this.updateComplete()
+        this.setMessageContentScroll()
+      }
+    }
+  },
+  methods: {
+    ...mapActions([
+      'updateComplete',
+      'userInput'
+    ]),
+    setMessageContentScroll () {
+      this.$nextTick(() => {
+        const messageContent = document.getElementById('messageContent')
+        if (messageContent) {
+          if (messageContent.scrollHeight > messageContent.clientHeight) {
+            messageContent.scrollTop = messageContent.scrollHeight
+          }
+        }
+      })
+    },
+    sendMessage (message) {
+      const messageId = Number(new Date())
+      const messageContext = {
+        user: {
+          id: this.userId,
+          name: this.userName,
+          avatarImage: this.avatarImage
+        },
+        roomId: this.selectedRoom.id,
+        id: messageId,
+        message,
+        loading: true,
+        type: 'input'
+      }
+      const request = {
+        userId: this.userId,
+        roomId: this.selectedRoom.id,
+        id: messageId,
+        message,
+        type: 'input'
+      }
+      this.userInput(messageContext)
+      this.$socket.emit('user_send_message', request)
+    }
+  }
+}
+```
+
+后端。接收到请求后，完成插入数据库处理并通过received事件返回给前端
+
+```python
+# /backend/blueprint/socketio.py
+@socketio.on('user_send_message', namespace='/chatroom')
+def user_input(message):
+    """获取用户输入
+    """
+    userId = message['userId']
+    user = User.query.filter_by(id=message['userId']).first()
+    if user:
+        response = {
+            'user': {
+                'id': user.id,
+                'name': user.username,
+                'avatarImage': user.avatar_image,
+            },
+            'message': message['message'],
+            'roomId': message['roomId'],
+            'id': message['id'],
+            'type': message['type'],
+            'time': datetime.utcnow().isoformat(),
+        }
+        roomRecord = RoomRecord(content=message['message'], user_id=user.id, room_id=message['roomId'])
+        db.session.add(roomRecord)
+        db.session.commit()
+        socketio.emit('received', response,
+                        namespace='/chatroom',
+                        room=message['roomId'])  
+```
+
+前端vuex的room模块接收
+
+```js
+// /fronted/src/store/module/room.js
+export default {
+  action: {
+    updateComplete ({ commit }) {
+      commit('setUpdate', false)
+    },
+    SOCKET_received ({ state, rootState, commit }, responseData) {
+      const messageList = state.messageList
+      const user = rootState.user
+      responseData.time = normalizeTimeDetail(responseData.time)
+      if (user.userId === responseData.user.id && responseData.type !== 'join') {
+        for (let i = messageList[responseData.roomId].length 1; i > 0; i--) {
+          if (messageList[responseData.roomId][i].user.id === user.userId && responseData.id === messageList[responseData.roomId][i].id) {
+            messageList[responseData.roomId][i].loading = false
+            messageList[responseData.roomId][i].time = responseData.time
+            break
+          }
+        }
+        if (!state.update) {
+          commit('setUpdate', true)
+        }
+      } else {
+        if (!messageList[responseData.roomId]) {
+          messageList[responseData.roomId] = []
+        }
+        messageList[responseData.roomId].push(responseData)
+        if (!state.update) {
+          commit('setUpdate', state.selectedRoom ? responseData.roomId === state.selectedRoom.id : false)
+        }
+      }
+      commit('setMessageList', messageList)
+    }
+  }
+}
+```
+
+## 4.总结
+
+说到这里其实也说完了重点的地方了，有兴趣可以看看源码。
+
+## 参考连接
+
+- [1] https://www.runoob.com/html/html5-websocket.html
+- [2] https://www.npmjs.com/package/vue-socket.io
+- [3] https://flask-socketio.readthedocs.io/en/latest/
